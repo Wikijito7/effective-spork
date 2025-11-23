@@ -10,11 +10,14 @@ const int DHT_SENSOR_TYPE = DHT22;
 
 const char* WIFI_SSID = "REPLACE_WITH_YOUR_SSID";
 const char* WIFI_PASSWORD = "REPLACE_WITH_YOUR_PASSWORD";
-const char* SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor";
+const char* GET_DATA_SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor/last";
+const char* POST_DATA_SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor";
 const char* SERVER_TOKEN = "REPLACE_WITH_TOKEN";
-const char* SENSOR_NAME = "Outside Sensor";
+const char* SENSOR_NAME = "Master Sensor";
 
 const int SLEEP_TIMER = 20;  // in seconds
+
+int loopCount = 0;
 
 DHT dht(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 HTTPClient https;
@@ -58,7 +61,7 @@ void sendRequest(char* body) {
     https.addHeader("Content-Type", "application/json");
     String token_key = String("Bearer ") + SERVER_TOKEN;
     https.addHeader("Authorization", token_key);
-    int result = https.GET();
+    int result = https.POST(body);
 
     if (result == 200) {
       Serial.println(https.getString());
@@ -67,22 +70,34 @@ void sendRequest(char* body) {
   }
 }
 
+char* getSatelliteDataFromServer() {
+  if (https.begin()) {
+
+  }
+}
+
+void displayDataOnScreen(char* data) {
+  JsonDocument doc;
+  deserializeJson(doc, json);
+}
+
 void setup() {
   Serial.begin(9600);
   dht.begin();
   WiFi.mode(WIFI_STA);
-  esp_sleep_enable_timer_wakeup(SLEEP_TIMER * uS_TO_S_FACTOR);
 
-  // We forcelly disconnect wifi, just in case it was connected from a previous session. If it came back from deep sleep, it will always be disconnected.
+  // We forcelly disconnect wifi, just in case it was connected from a previous session.
   WiFi.disconnect();
   connectToWifi();
-
-  char* sensorData = readSensorValues();
-  sendRequest(sensorData); 
-
-  Serial.println("Going to sleep now");
-  Serial.flush();
-  esp_deep_sleep_start();
 }
 
-void loop() {}
+void loop() {
+
+  if (loopCount >= 5) {
+    char* sensorData = readSensorValues();
+    sendRequest(sensorData);
+  }
+
+  loopCount++;
+  sleep(1000);
+}
