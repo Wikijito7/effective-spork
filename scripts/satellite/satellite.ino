@@ -16,8 +16,6 @@ const char* SENSOR_NAME = "Outside Sensor";
 
 const int SLEEP_TIMER = 20;  // in seconds
 
-RTC_DATA_ATTR int bootCount = 0;
-
 DHT dht(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 HTTPClient https;
 
