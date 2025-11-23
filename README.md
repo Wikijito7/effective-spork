@@ -9,6 +9,7 @@ Custom Arduino scripts for ESP32S3.
   - WiFi (built in with ESP32 boards)
   - HTTPClient
   - ArduinoJson by Benoit Blanchon, version 7+.
+  - u8g2 library for screen.
  
 ## What's included
 On this repo, you'll find mainly two scripts: 
