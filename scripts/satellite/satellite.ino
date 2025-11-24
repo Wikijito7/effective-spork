@@ -10,7 +10,7 @@ const int DHT_SENSOR_TYPE = DHT22;
 
 const char* WIFI_SSID = "REPLACE_WITH_YOUR_SSID";
 const char* WIFI_PASSWORD = "REPLACE_WITH_YOUR_PASSWORD";
-const char* SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor";
+const char* POST_DATA_SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor";
 const char* SERVER_TOKEN = "REPLACE_WITH_TOKEN";
 const char* SENSOR_NAME = "Outside Sensor";
 
@@ -22,7 +22,14 @@ HTTPClient https;
 void connectToWifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to WiFi ..");
+  long connectionTry = millis();
   while (WiFi.status() != WL_CONNECTED) {
+    long now = millis();
+    if (now - connectionTry > 10000) {
+      Serial.println();
+      Serial.println("Cannot connect to given Wifi");
+      break;
+    }
     Serial.print('.');
     delay(1000);
   }
@@ -30,9 +37,9 @@ void connectToWifi() {
   Serial.println(WiFi.localIP());
 }
 
-char* readSensorValues() {
+String readSensorValues() {
   JsonDocument jsonDoc;
-  char serializedJson[256];
+  String serializedJson;
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
@@ -45,20 +52,19 @@ char* readSensorValues() {
   } else {
     jsonDoc["temp"] = t;
     jsonDoc["hum"] = h;
-
-    serializeJson(jsonDoc, serializedJson);
-    Serial.println(serializedJson);
   }
+  serializeJson(jsonDoc, serializedJson);
+  Serial.println(serializedJson);
 
   return serializedJson;
 }
 
-void sendRequest(char* body) {
-  if (https.begin(SERVER)) {
+void sendRequest(String body) {
+  if (https.begin(POST_DATA_SERVER)) {
     https.addHeader("Content-Type", "application/json");
-    String token_key = String("Bearer ") + SERVER_TOKEN;
-    https.addHeader("Authorization", token_key);
-    int result = https.GET();
+    String tokenKey = String("Bearer ") + SERVER_TOKEN;
+    https.addHeader("Authorization", tokenKey);
+    int result = https.POST(body);
 
     if (result == 200) {
       Serial.println(https.getString());
@@ -77,7 +83,7 @@ void setup() {
   WiFi.disconnect();
   connectToWifi();
 
-  char* sensorData = readSensorValues();
+  String sensorData = readSensorValues();
   sendRequest(sensorData); 
 
   Serial.println("Going to sleep now");

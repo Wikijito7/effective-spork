@@ -41,9 +41,9 @@ void connectToWifi() {
   Serial.println(WiFi.localIP());
 }
 
-char* readSensorValues() {
+String readSensorValues() {
   JsonDocument jsonDoc;
-  char serializedJson[256];
+  String serializedJson;
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
@@ -56,15 +56,14 @@ char* readSensorValues() {
   } else {
     jsonDoc["temp"] = t;
     jsonDoc["hum"] = h;
-
-    serializeJson(jsonDoc, serializedJson);
-    Serial.println(serializedJson);
   }
+  serializeJson(jsonDoc, serializedJson);
+  Serial.println(serializedJson);
 
   return serializedJson;
 }
 
-void sendRequest(char* body) {
+void sendRequest(String body) {
   if (https.begin(POST_DATA_SERVER)) {
     drawDataUploadIcon();
     https.addHeader("Content-Type", "application/json");
@@ -116,21 +115,31 @@ String getSatelliteDataFromServer() {
   return response;
 }
 
-void displayDataOnScreen(String data) {
+void displayRemoteDataOnScreen(String data) {
   JsonDocument doc;
   deserializeJson(doc, data);
 
   JsonArray deserializedData = doc["sensors"];
 
   for (JsonDocument item : deserializedData) {
-    String name = item["name"];
-    double temp = item["temp"];
-    double hum = item["hum"];
-    displayCurrentDataOnScreen(name, temp, hum);
+    displayChildData(item);
   }
 }
 
-void displayCurrentDataOnScreen(String name, double temp, double hum) {
+void deserializeLocalData(String data) {
+  JsonDocument doc;
+  deserializeJson(doc, data);
+  displayChildData(doc);
+}
+
+void displayChildData(JsonDocument item) {
+  String name = item["name"];
+  float temp = item["temp"];
+  float hum = item["hum"];
+  displayCurrentDataOnScreen(name, temp, hum);
+}
+
+void displayCurrentDataOnScreen(String name, float temp, float hum) {
   String formattedTemp = String(temp, 1) + " C";
   String formattedHum = String(hum, 0) + " %";
 
@@ -142,6 +151,13 @@ void displayCurrentDataOnScreen(String name, double temp, double hum) {
   updateWifiStatusIcon();
   u8g2.sendBuffer();
   delay(4000);
+}
+
+void runConnectedWorkflow(String sensorData) {
+  sendRequest(sensorData);
+  String remoteData = getSatelliteDataFromServer();
+  String mockedData = "{\"sensors\":[{\"name\":\"manolete\", \"temp\": 13.4, \"hum\": 69}, {\"name\":\"manolete2\", \"temp\": 14.6, \"hum\": 42}]}";
+  displayRemoteDataOnScreen(mockedData);
 }
 
 void setup() {
@@ -160,11 +176,12 @@ void loop() {
   long currentTime = millis();
   if (currentTime - lastUpdate > SLEEP_TIMER || lastUpdate == 0) { // 20 secs has passed or first loop
     lastUpdate = millis();
-    char* sensorData = readSensorValues();
-    sendRequest(sensorData);
-    String remoteData = getSatelliteDataFromServer();
-    String mockedData = "{\"sensors\":[{\"name\":\"manolete\", \"temp\": 13.4, \"hum\": 69}, {\"name\":\"manolete2\", \"temp\": 14.6, \"hum\": 42}]}";
-    displayDataOnScreen(mockedData);
+    String sensorData = readSensorValues();
+    if (WiFi.status() == WL_CONNECTED) {
+      runConnectedWorkflow(sensorData);
+    } else {
+      deserializeLocalData(sensorData);
+    }
   }
 
   delay(1000);
