@@ -156,8 +156,7 @@ void displayCurrentDataOnScreen(String name, float temp, float hum) {
 void runConnectedWorkflow(String sensorData) {
   sendRequest(sensorData);
   String remoteData = getSatelliteDataFromServer();
-  String mockedData = "{\"sensors\":[{\"name\":\"manolete\", \"temp\": 13.4, \"hum\": 69}, {\"name\":\"manolete2\", \"temp\": 14.6, \"hum\": 42}]}";
-  displayRemoteDataOnScreen(mockedData);
+  displayRemoteDataOnScreen(remoteData);
 }
 
 void setup() {
