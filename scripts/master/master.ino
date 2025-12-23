@@ -12,7 +12,7 @@ const int SCREEN_DATA_PIN = SDA;
 const char* WIFI_SSID = "REPLACE_WITH_YOUR_SSID";
 const char* WIFI_PASSWORD = "REPLACE_WITH_YOUR_PASSWORD";
 const char* GET_DATA_SERVER = "https://REPLACE_WITH_YOUR_SERVER/api/sensor/last";
-const char* POST_DATA_SERVER = "https://REPLACE_WITH_YOUR_SERVER/api/sensor";
+const char* POST_DATA_SERVER = "https://REPLACE_WITH_YOUR_SERVER/api/sensor/simple";
 const char* SERVER_TOKEN = "REPLACE_WITH_TOKEN";
 const char* SENSOR_NAME = "Master Sensor";
 

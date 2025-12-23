@@ -10,7 +10,7 @@ const int DHT_SENSOR_TYPE = DHT22;
 
 const char* WIFI_SSID = "REPLACE_WITH_YOUR_SSID";
 const char* WIFI_PASSWORD = "REPLACE_WITH_YOUR_PASSWORD";
-const char* POST_DATA_SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor";
+const char* POST_DATA_SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor/simple";
 const char* SERVER_TOKEN = "REPLACE_WITH_TOKEN";
 const char* SENSOR_NAME = "Outside Sensor";
 
