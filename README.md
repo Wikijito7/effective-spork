@@ -21,3 +21,16 @@ On this repo, you'll find mainly two scripts:
 This server will pull data from each satellite and make it available. You'll be able to make data from each sensor public or keep it private. Server repo: SOON™.
 
 This server will come with a website, where you'll be able to modify the visibility of each sensor and see the historic data of each sensor on a graph. Website repo: SOON™.
+
+## How to build it
+
+### Satellite
+TODO: bom and explanation
+
+<img width="1212" height="565" alt="image" src="https://github.com/user-attachments/assets/fd9b48e8-f508-42c0-ac9d-bb0a4c741077" />
+
+
+### Master
+TODO: bom and explanation
+
+<img width="1473" height="760" alt="image" src="https://github.com/user-attachments/assets/dc8850ac-c0e9-4d06-ab2d-f6c8348c11e0" />
