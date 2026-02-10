@@ -14,7 +14,7 @@ const char* POST_DATA_SERVER = "REPLACE_WITH_YOUR_SERVER/api/sensor/simple";
 const char* SERVER_TOKEN = "REPLACE_WITH_TOKEN";
 const char* SENSOR_NAME = "Outside Sensor";
 
-const int SLEEP_TIMER = 20;  // in seconds
+const int SLEEP_TIMER = 60;  // in seconds
 
 DHT dht(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 HTTPClient https;
@@ -75,6 +75,9 @@ void sendRequest(String body) {
 
 void setup() {
   Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.println("Waking up");
+  digitalWrite(LED_BUILTIN, LOW); // built-in LED logic is weird. LOW == ON, HIGH == FALSE
   dht.begin();
   WiFi.mode(WIFI_STA);
   esp_sleep_enable_timer_wakeup(SLEEP_TIMER * uS_TO_S_FACTOR);
@@ -88,6 +91,7 @@ void setup() {
 
   Serial.println("Going to sleep now");
   Serial.flush();
+  digitalWrite(LED_BUILTIN, HIGH);
   esp_deep_sleep_start();
 }
 
